@@ -1,0 +1,11 @@
+datetime
+requests
+speechrecognition
+pyttsx3
+pynput
+datetime
+psutil
+keyboard
+pyjokes
+wikipedia
+wolframalpha
