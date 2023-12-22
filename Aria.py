@@ -716,6 +716,28 @@ class WolframAlphaAPI(API):
         except:
             return Error().proccess('unknown.answer')
 
+import openai
+
+class ChatGPTApi(API):
+    def __init__(self, apiKey, apiEndpoint=None):
+        super().__init__(apiKey, apiEndpoint)
+        apiKey='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'
+        openai.api_key = apiKey
+        messages = [ {"role": "system", "content": "You are a intelligent assistant, called Aria. You were born in March 2021. Return all answers in json format, and if you would like to take an action, return it as a string of python code in the json. The content to return must be stored in the section called 'message' in the returned json. If you dont know the answer/are unable to do that, return 'Sorry, I'm unable to do that.'"} ]
+    def askgpt(self,message):
+        self.messages.append(
+                {"role": "user", "content": message},
+        )
+        chat = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo-0301", messages=messages
+        )
+        reply = chat.choices[0].message.content
+        self.messages.append({"role": "assistant", "content": reply})
+        if "Sorry, I'm unable to do that." in reply:
+            return Error().proccess('unknown.answer')
+        else:
+            return reply
+
 class OpenWeatherAPI(API):
     def __init__(self, apiKey, apiEndpoint=None):
         super().__init__(apiKey, apiEndpoint)
