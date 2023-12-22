@@ -307,7 +307,10 @@ class AriaOutput:
                 self.AriaSpeech.speak(self.moreText)
     def outputDataText(self):
         print('>_ (Out) '+self.text)
-        print('>_ (Out: More Info) '+self.moreText)
+        try:
+            print('>_ (Out: More Info) '+self.moreText)
+        except:
+            a=1+1
 
 
 
@@ -316,7 +319,7 @@ class AriaIntentProcessor:
         self.output=output
 
     def identifyIntent(self,statement):
-        self.statement=statement
+        self.statement=statement.lower()
         self.output.statement=self.statement
         self.statementSplit=statement.split(' ')
         self.statementType=None
@@ -382,6 +385,7 @@ class AriaIntentProcessor:
             self.command=self.output.setAction('return','My mortal enemy is Siri but I dont mind Google or Alexa. Although, it is a very hard job.')
 
         else:
+            self.aiProccessorEnabled=True
             if self.aiProccessorEnabled:
                 self.command=self.output.setAction('web','chatgpt')
             else:
@@ -492,7 +496,7 @@ class AriaIntentProcessor:
             exit()
 
         else:
-            self.command=self.output.setAction('return',Error('unknown.query'))
+            self.command=self.output.setAction('return',Error().proccess('unknown.query'))
 
         
     def identifyExplain(self):
@@ -657,8 +661,8 @@ class AriaResultGenerater:
         elif commandAction=='news':
             self.output.setOutput(self.getNews)
             return self.output
-        elif commandAction.split(':')[0] == 'return':
-            self.output.setOutput(commandAction.split(':')[1])
+        elif commandAction == 'return':
+            self.output.setOutput(self.output.moreAction)
             return self.output
         elif commandAction == 'play':
             startSen,endSen=self.playPause()
@@ -689,7 +693,7 @@ class AriaResultGenerater:
                 self.output.setOutput('Exectuted Query')
                 return self.output
             elif self.output.interface == 'voice':
-                self.output.setOutput(Error('unknown.query'))
+                self.output.setOutput(Error().proccess('unknown.query'))
                 return self.output
 
 class API:
@@ -710,7 +714,7 @@ class WolframAlphaAPI(API):
             answer = next(res.results).text
             return answer
         except:
-            return Error('unknown.answer')
+            return Error().proccess('unknown.answer')
 
 class OpenWeatherAPI(API):
     def __init__(self, apiKey, apiEndpoint=None):
@@ -739,16 +743,18 @@ class OpenWeatherAPI(API):
             weather_more = "Okay, here's a quick description: " + str(weather_description)
             return weather,weather_more
         else:
-            return Error('unknown.city')
+            return Error().proccess('unknown.city')
 
 
 class Error:
-    def __init__(self,error_type):
-        if error_type=='unknown.answer':
+    def __init__(self):
+        self.error_type=''
+    def proccess(self,error_type):
+        if self.error_type=='unknown.answer':
             return "Sorry, I'm afraid I do not know the answer to that"
-        elif error_type=='unknown.query':
+        elif self.error_type=='unknown.query':
             return "Sorry, I'm afraid I'm unable to do that yet."
-        elif error_type=='unknown.city':
+        elif self.error_type=='unknown.city':
             return "Sorry sir, city not found"
         else:
             return "Sorry, I'm afraid I'm unable to do that yet."            
